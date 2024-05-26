@@ -1,0 +1,180 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+typedef struct {
+    int top1;
+    int top2;
+    int items[MAX];
+} TwoStacks;
+
+void initialize(TwoStacks *ts) {
+    ts->top1 = -1;
+    ts->top2 = MAX;
+}
+
+int isFull(TwoStacks *ts) {
+    return ts->top1 + 1 == ts->top2;
+}
+
+int isEmpty1(TwoStacks *ts) {
+    return ts->top1 == -1;
+}
+
+int isEmpty2(TwoStacks *ts) {
+    return ts->top2 == MAX;
+}
+
+void push1(TwoStacks *ts, int value) {
+    if (isFull(ts)) {
+        printf("Stack 1 is full\n");
+        return;
+    }
+    ts->items[++(ts->top1)] = value;
+}
+
+void push2(TwoStacks *ts, int value) {
+    if (isFull(ts)) {
+        printf("Stack 2 is full\n");
+        return;
+    }
+    ts->items[--(ts->top2)] = value;
+}
+
+int pop1(TwoStacks *ts) {
+    if (isEmpty1(ts)) {
+        printf("Stack 1 is empty\n");
+        return -1;
+    }
+    return ts->items[(ts->top1)--];
+}
+
+int pop2(TwoStacks *ts) {
+    if (isEmpty2(ts)) {
+        printf("Stack 2 is empty\n");
+        return -1;
+    }
+    return ts->items[(ts->top2)++];
+}
+
+void displayStack1(TwoStacks *ts) {
+    if (isEmpty1(ts)) {
+        printf("Stack 1 is empty\n");
+        return;
+    }
+    printf("Stack 1: ");
+    for (int i = 0; i <= ts->top1; i++) {
+        printf("%d ", ts->items[i]);
+    }
+    printf("\n");
+}
+
+void displayStack2(TwoStacks *ts) {
+    if (isEmpty2(ts)) {
+        printf("Stack 2 is empty\n");
+        return;
+    }
+    printf("Stack 2: ");
+    for (int i = MAX - 1; i >= ts->top2; i--) {
+        printf("%d ", ts->items[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    TwoStacks ts;
+    initialize(&ts);
+    
+    int choice, value;
+    
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Push to Stack 1\n");
+        printf("2. Push to Stack 2\n");
+        printf("3. Pop from Stack 1\n");
+        printf("4. Pop from Stack 2\n");
+        printf("5. Check if Stack 1 is Full\n");
+        printf("6. Check if Stack 2 is Full\n");
+        printf("7. Check if Stack 1 is Empty\n");
+        printf("8. Check if Stack 2 is Empty\n");
+        printf("9. Display Stack 1\n");
+        printf("10. Display Stack 2\n");
+        printf("11. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                printf("Enter value to push to Stack 1: ");
+                scanf("%d", &value);
+                push1(&ts, value);
+                break;
+            case 2:
+                printf("Enter value to push to Stack 2: ");
+                scanf("%d", &value);
+                push2(&ts, value);
+                break;
+            case 3:
+                printf("Popped from Stack 1: %d\n", pop1(&ts));
+                break;
+            case 4:
+                printf("Popped from Stack 2: %d\n", pop2(&ts));
+                break;
+            case 5:
+                printf("Stack 1 is %s\n", isFull(&ts) ? "full" : "not full");
+                break;
+            case 6:
+                printf("Stack 2 is %s\n", isFull(&ts) ? "full" : "not full");
+                break;
+            case 7:
+                printf("Stack 1 is %s\n", isEmpty1(&ts) ? "empty" : "not empty");
+                break;
+            case 8:
+                printf("Stack 2 is %s\n", isEmpty2(&ts) ? "empty" : "not empty");
+                break;
+            case 9:
+                displayStack1(&ts);
+                break;
+            case 10:
+                displayStack2(&ts);
+                break;
+            case 11:
+                exit(0);
+            default:
+                printf("Invalid choice\n");
+        }
+    }
+    
+    return 0;
+}
+*/Menu:
+1. Push to Stack 1
+2. Push to Stack 2
+3. Pop from Stack 1
+4. Pop from Stack 2
+5. Check if Stack 1 is Full
+6. Check if Stack 2 is Full
+7. Check if Stack 1 is Empty
+8. Check if Stack 2 is Empty
+9. Display Stack 1
+10. Display Stack 2
+11. Exit
+Enter your choice: 1
+Enter value to push to Stack 1: 10
+
+Menu:
+1. Push to Stack 1
+2. Push to Stack 2
+3. Pop from Stack 1
+4. Pop from Stack 2
+5. Check if Stack 1 is Full
+6. Check if Stack 2 is Full
+7. Check if Stack 1 is Empty
+8. Check if Stack 2 is Empty
+9. Display Stack 1
+10. Display Stack 2
+11. Exit
+Enter your choice: 9
+Stack 1: 10 
+/*
