@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+typedef struct {
+    int items[MAX];
+    int top;
+} Stack;
+
+void init(Stack *s) {
+    s->top = -1;
+}
+
+int isEmpty(Stack *s) {
+    return s->top == -1;
+}
+
+int isFull(Stack *s) {
+    return s->top == MAX - 1;
+}
+
+void push(Stack *s, int value) {
+    if (isFull(s)) {
+        printf("Stack overflow\n");
+        return;
+    }
+    s->items[++s->top] = value;
+}
+
+int pop(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack underflow\n");
+        return -1;
+    }
+    return s->items[s->top--];
+}
+
+int factorial(int n) {
+    Stack stack;
+    init(&stack);
+    
+    int result = 1;
+    while (n > 1) {
+        push(&stack, n);
+        n--;
+    }
+    
+    while (!isEmpty(&stack)) {
+        result *= pop(&stack);
+    }
+    
+    return result;
+}
+
+int main() {
+    int num;
+    printf("Enter a number to find its factorial: ");
+    scanf("%d", &num);
+    
+    if (num < 0) {
+        printf("Factorial of negative number is not defined.\n");
+    } else {
+        printf("Factorial of %d is %d\n", num, factorial(num));
+    }
+    
+    return 0;
+}
