@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+typedef struct {
+    int items[MAX];
+    int top;
+} Stack;
+
+void init(Stack *s) {
+    s->top = -1;
+}
+
+int isEmpty(Stack *s) {
+    return s->top == -1;
+}
+
+int isFull(Stack *s) {
+    return s->top == MAX - 1;
+}
+
+void push(Stack *s, int value) {
+    if (isFull(s)) {
+        printf("Stack overflow\n");
+        return;
+    }
+    s->items[++s->top] = value;
+}
+
+int pop(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack underflow\n");
+        return -1;
+    }
+    return s->items[s->top--];
+}
+
+void generateFibonacci(int n) {
+    Stack stack;
+    init(&stack);
+    
+    push(&stack, 0);
+    push(&stack, 1);
+    
+    printf("Fibonacci series: ");
+    for (int i = 0; i < n; i++) {
+        int a = pop(&stack);
+        int b = pop(&stack);
+        printf("%d ", a);
+        push(&stack, a);
+        push(&stack, a + b);
+    }
+    printf("\n");
+}
+
+int main() {
+    int num;
+    printf("Enter the number of terms in Fibonacci series: ");
+    scanf("%d", &num);
+    
+    if (num <= 0) {
+        printf("Number of terms must be positive.\n");
+    } else {
+        generateFibonacci(num);
+    }
+    
+    return 0;
+}
