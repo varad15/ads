@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 10
+
+typedef struct {
+    int arr[MAX];
+    int front1, rear1;
+    int front2, rear2;
+} DoubleQueue;
+
+void initQueue(DoubleQueue *dq) {
+    dq->front1 = -1;
+    dq->rear1 = -1;
+    dq->front2 = MAX;
+    dq->rear2 = MAX;
+}
+
+int isFull(DoubleQueue *dq) {
+    return dq->rear1 + 1 == dq->rear2;
+}
+
+int isEmptyQueue1(DoubleQueue *dq) {
+    return dq->front1 == -1;
+}
+
+int isEmptyQueue2(DoubleQueue *dq) {
+    return dq->front2 == MAX;
+}
+
+void addQueue1(DoubleQueue *dq, int value) {
+    if (isFull(dq)) {
+        printf("Queue 1 is full\n");
+        return;
+    }
+    if (dq->front1 == -1) {
+        dq->front1 = 0;
+    }
+    dq->arr[++dq->rear1] = value;
+}
+
+void addQueue2(DoubleQueue *dq, int value) {
+    if (isFull(dq)) {
+        printf("Queue 2 is full\n");
+        return;
+    }
+    if (dq->front2 == MAX) {
+        dq->front2 = MAX - 1;
+    }
+    dq->arr[--dq->rear2] = value;
+}
+
+void delQueue1(DoubleQueue *dq) {
+    if (isEmptyQueue1(dq)) {
+        printf("Queue 1 is empty\n");
+        return;
+    }
+    printf("Deleted from Queue 1: %d\n", dq->arr[dq->front1]);
+    if (dq->front1 == dq->rear1) {
+        dq->front1 = dq->rear1 = -1;
+    } else {
+        dq->front1++;
+    }
+}
+
+void delQueue2(DoubleQueue *dq) {
+    if (isEmptyQueue2(dq)) {
+        printf("Queue 2 is empty\n");
+        return;
+    }
+    printf("Deleted from Queue 2: %d\n", dq->arr[dq->front2]);
+    if (dq->front2 == dq->rear2) {
+        dq->front2 = dq->rear2 = MAX;
+    } else {
+        dq->front2--;
+    }
+}
+
+void displayQueue1(DoubleQueue *dq) {
+    if (isEmptyQueue1(dq)) {
+        printf("Queue 1 is empty\n");
+        return;
+    }
+    printf("Queue 1: ");
+    for (int i = dq->front1; i <= dq->rear1; i++) {
+        printf("%d ", dq->arr[i]);
+    }
+    printf("\n");
+}
+
+void displayQueue2(DoubleQueue *dq) {
+    if (isEmptyQueue2(dq)) {
+        printf("Queue 2 is empty\n");
+        return;
+    }
+    printf("Queue 2: ");
+    for (int i = dq->front2; i >= dq->rear2; i--) {
+        printf("%d ", dq->arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    DoubleQueue dq;
+    initQueue(&dq);
+
+    addQueue1(&dq, 10);
+    addQueue1(&dq, 20);
+    addQueue1(&dq, 30);
+    displayQueue1(&dq);
+
+    addQueue2(&dq, 40);
+    addQueue2(&dq, 50);
+    displayQueue2(&dq);
+
+    delQueue1(&dq);
+    displayQueue1(&dq);
+
+    delQueue2(&dq);
+    displayQueue2(&dq);
+
+    return 0;
+}
