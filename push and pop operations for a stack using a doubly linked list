@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a doubly linked list node
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+    return newNode;
+}
+
+// Function to push an element onto the stack
+void push(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        newNode->next = *head;
+        (*head)->prev = newNode;
+        *head = newNode;
+    }
+    printf("Pushed %d onto the stack.\n", data);
+}
+
+// Function to pop an element from the stack
+int pop(struct Node** head) {
+    if (*head == NULL) {
+        printf("Stack underflow! Cannot pop from an empty stack.\n");
+        return -1;
+    }
+    struct Node* temp = *head;
+    int poppedData = temp->data;
+    *head = (*head)->next;
+    if (*head != NULL) {
+        (*head)->prev = NULL;
+    }
+    free(temp);
+    printf("Popped %d from the stack.\n", poppedData);
+    return poppedData;
+}
+
+// Function to print the stack
+void printStack(struct Node* head) {
+    struct Node* temp = head;
+    printf("Stack: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Main function to test push and pop operations
+int main() {
+    struct Node* stack = NULL;
+
+    push(&stack, 10);
+    push(&stack, 20);
+    push(&stack, 30);
+    printStack(stack);
+
+    pop(&stack);
+    printStack(stack);
+
+    pop(&stack);
+    printStack(stack);
+
+    pop(&stack);
+    printStack(stack);
+
+    pop(&stack); // This should display an underflow message
+
+    return 0;
+}
