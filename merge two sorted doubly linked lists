@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a doubly linked list node
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+    return newNode;
+}
+
+// Function to insert a node at the end of the doubly linked list
+void insertEnd(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    struct Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+// Function to merge two sorted doubly linked lists
+struct Node* mergeLists(struct Node* head1, struct Node* head2) {
+    if (!head1) return head2;
+    if (!head2) return head1;
+
+    struct Node* mergedHead = NULL;
+
+    if (head1->data <= head2->data) {
+        mergedHead = head1;
+        mergedHead->next = mergeLists(head1->next, head2);
+        if (mergedHead->next) mergedHead->next->prev = mergedHead;
+    } else {
+        mergedHead = head2;
+        mergedHead->next = mergeLists(head1, head2->next);
+        if (mergedHead->next) mergedHead->next->prev = mergedHead;
+    }
+    return mergedHead;
+}
+
+// Function to print the doubly linked list
+void printList(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Main function to test the merge functionality
+int main() {
+    struct Node* head1 = NULL;
+    struct Node* head2 = NULL;
+
+    // Creating first sorted doubly linked list
+    insertEnd(&head1, 1);
+    insertEnd(&head1, 3);
+    insertEnd(&head1, 5);
+    insertEnd(&head1, 7);
+
+    // Creating second sorted doubly linked list
+    insertEnd(&head2, 2);
+    insertEnd(&head2, 4);
+    insertEnd(&head2, 6);
+    insertEnd(&head2, 8);
+
+    printf("First sorted doubly linked list:\n");
+    printList(head1);
+
+    printf("Second sorted doubly linked list:\n");
+    printList(head2);
+
+    struct Node* mergedHead = mergeLists(head1, head2);
+
+    printf("Merged sorted doubly linked list:\n");
+    printList(mergedHead);
+
+    return 0;
+}
