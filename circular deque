@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5
+
+typedef struct {
+    int arr[MAX];
+    int front;
+    int rear;
+    int size;
+} Deque;
+
+void initDeque(Deque *dq) {
+    dq->front = -1;
+    dq->rear = -1;
+    dq->size = 0;
+}
+
+int isFull(Deque *dq) {
+    return dq->size == MAX;
+}
+
+int isEmpty(Deque *dq) {
+    return dq->size == 0;
+}
+
+void insertFront(Deque *dq, int value) {
+    if (isFull(dq)) {
+        printf("Deque is full\n");
+        return;
+    }
+    if (dq->front == -1) { // First element to be inserted
+        dq->front = dq->rear = 0;
+    } else {
+        dq->front = (dq->front - 1 + MAX) % MAX;
+    }
+    dq->arr[dq->front] = value;
+    dq->size++;
+}
+
+void insertRear(Deque *dq, int value) {
+    if (isFull(dq)) {
+        printf("Deque is full\n");
+        return;
+    }
+    if (dq->rear == -1) { // First element to be inserted
+        dq->front = dq->rear = 0;
+    } else {
+        dq->rear = (dq->rear + 1) % MAX;
+    }
+    dq->arr[dq->rear] = value;
+    dq->size++;
+}
+
+void deleteFront(Deque *dq) {
+    if (isEmpty(dq)) {
+        printf("Deque is empty\n");
+        return;
+    }
+    printf("Deleted from front: %d\n", dq->arr[dq->front]);
+    if (dq->front == dq->rear) { // Only one element was in the deque
+        dq->front = dq->rear = -1;
+    } else {
+        dq->front = (dq->front + 1) % MAX;
+    }
+    dq->size--;
+}
+
+void deleteRear(Deque *dq) {
+    if (isEmpty(dq)) {
+        printf("Deque is empty\n");
+        return;
+    }
+    printf("Deleted from rear: %d\n", dq->arr[dq->rear]);
+    if (dq->front == dq->rear) { // Only one element was in the deque
+        dq->front = dq->rear = -1;
+    } else {
+        dq->rear = (dq->rear - 1 + MAX) % MAX;
+    }
+    dq->size--;
+}
+
+void displayDeque(Deque *dq) {
+    if (isEmpty(dq)) {
+        printf("Deque is empty\n");
+        return;
+    }
+    printf("Deque elements: ");
+    int i = dq->front;
+    for (int count = 0; count < dq->size; count++) {
+        printf("%d ", dq->arr[i]);
+        i = (i + 1) % MAX;
+    }
+    printf("\n");
+}
+
+int main() {
+    Deque dq;
+    initDeque(&dq);
+
+    insertRear(&dq, 5);
+    insertRear(&dq, 10);
+    insertFront(&dq, 15);
+    insertFront(&dq, 20);
+    displayDeque(&dq); // Expected output: 20 15 5 10
+
+    deleteFront(&dq);
+    deleteRear(&dq);
+    displayDeque(&dq); // Expected output: 15 5
+
+    insertRear(&dq, 25);
+    insertFront(&dq, 30);
+    displayDeque(&dq); // Expected output: 30 15 5 25
+
+    deleteFront(&dq);
+    deleteRear(&dq);
+    displayDeque(&dq); // Expected output: 15 5
+
+    return 0;
+}
