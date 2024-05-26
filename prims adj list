@@ -1,0 +1,204 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+// Structure to represent an adjacency list node
+typedef struct AdjListNode {
+    int dest;
+    int weight;
+    struct AdjListNode* next;
+} AdjListNode;
+
+// Structure to represent an adjacency list
+typedef struct AdjList {
+    struct AdjListNode* head;
+} AdjList;
+
+// Structure to represent a graph
+typedef struct Graph {
+    int V;
+    struct AdjList* array;
+} Graph;
+
+// Structure to represent a node in the priority queue
+typedef struct MinHeapNode {
+    int v;
+    int key;
+} MinHeapNode;
+
+// Structure to represent a priority queue
+typedef struct MinHeap {
+    int size;
+    int capacity;
+    int* pos;
+    struct MinHeapNode** array;
+} MinHeap;
+
+// Function to create a new adjacency list node
+AdjListNode* newAdjListNode(int dest, int weight) {
+    AdjListNode* newNode = (AdjListNode*)malloc(sizeof(AdjListNode));
+    newNode->dest = dest;
+    newNode->weight = weight;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to create a graph with V vertices
+Graph* createGraph(int V) {
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
+    graph->V = V;
+    graph->array = (AdjList*)malloc(V * sizeof(AdjList));
+    for (int i = 0; i < V; ++i)
+        graph->array[i].head = NULL;
+    return graph;
+}
+
+// Function to add an edge to an undirected graph
+void addEdge(Graph* graph, int src, int dest, int weight) {
+    AdjListNode* newNode = newAdjListNode(dest, weight);
+    newNode->next = graph->array[src].head;
+    graph->array[src].head = newNode;
+    newNode = newAdjListNode(src, weight);
+    newNode->next = graph->array[dest].head;
+    graph->array[dest].head = newNode;
+}
+
+// Function to create a new Min Heap node
+MinHeapNode* newMinHeapNode(int v, int key) {
+    MinHeapNode* minHeapNode = (MinHeapNode*)malloc(sizeof(MinHeapNode));
+    minHeapNode->v = v;
+    minHeapNode->key = key;
+    return minHeapNode;
+}
+
+// Function to create a Min Heap
+MinHeap* createMinHeap(int capacity) {
+    MinHeap* minHeap = (MinHeap*)malloc(sizeof(MinHeap));
+    minHeap->pos = (int*)malloc(capacity * sizeof(int));
+    minHeap->size = 0;
+    minHeap->capacity = capacity;
+    minHeap->array = (MinHeapNode**)malloc(capacity * sizeof(MinHeapNode*));
+    return minHeap;
+}
+
+// Function to swap two Min Heap nodes
+void swapMinHeapNode(MinHeapNode** a, MinHeapNode** b) {
+    MinHeapNode* t = *a;
+    *a = *b;
+    *b = t;
+}
+
+// Function to heapify at given index
+void minHeapify(MinHeap* minHeap, int idx) {
+    int smallest, left, right;
+    smallest = idx;
+    left = 2 * idx + 1;
+    right = 2 * idx + 2;
+    if (left < minHeap->size && minHeap->array[left]->key < minHeap->array[smallest]->key)
+        smallest = left;
+    if (right < minHeap->size && minHeap->array[right]->key < minHeap->array[smallest]->key)
+        smallest = right;
+    if (smallest != idx) {
+        MinHeapNode* smallestNode = minHeap->array[smallest];
+        MinHeapNode* idxNode = minHeap->array[idx];
+        minHeap->pos[smallestNode->v] = idx;
+        minHeap->pos[idxNode->v] = smallest;
+        swapMinHeapNode(&minHeap->array[smallest], &minHeap->array[idx]);
+        minHeapify(minHeap, smallest);
+    }
+}
+
+// Function to check if the given Min Heap is empty or not
+int isEmpty(MinHeap* minHeap) {
+    return minHeap->size == 0;
+}
+
+// Function to extract the minimum node from Min Heap
+MinHeapNode* extractMin(MinHeap* minHeap) {
+    if (isEmpty(minHeap))
+        return NULL;
+    MinHeapNode* root = minHeap->array[0];
+    MinHeapNode* lastNode = minHeap->array[minHeap->size - 1];
+    minHeap->array[0] = lastNode;
+    minHeap->pos[root->v] = minHeap->size - 1;
+    minHeap->pos[lastNode->v] = 0;
+    --minHeap->size;
+    minHeapify(minHeap, 0);
+    return root;
+}
+
+// Function to decrease the key value of a given vertex
+void decreaseKey(MinHeap* minHeap, int v, int key) {
+    int i = minHeap->pos[v];
+    minHeap->array[i]->key = key;
+    while (i && minHeap->array[i]->key < minHeap->array[(i - 1) / 2]->key) {
+        minHeap->pos[minHeap->array[i]->v] = (i - 1) / 2;
+        minHeap->pos[minHeap->array[(i - 1) / 2]->v] = i;
+        swapMinHeapNode(&minHeap->array[i], &minHeap->array[(i - 1) / 2]);
+        i = (i - 1) / 2;
+    }
+}
+
+// Function to check if a given vertex is in Min Heap or not
+int isInMinHeap(MinHeap* minHeap, int v) {
+    if (minHeap->pos[v] < minHeap->size)
+        return 1;
+    return 0;
+}
+
+// Function to print the constructed MST
+void printMST(int parent[], int n, int** graph) {
+    printf("Edge   Weight\n");
+    for (int i = 1; i < n; ++i)
+        printf("%d - %d    %d\n", parent[i], i, graph[i][parent[i]]);
+}
+
+// Function to implement Prim's algorithm to construct MST
+void primMST(Graph* graph) {
+    int V = graph->V;
+    int parent[V];
+    int key[V];
+    MinHeap* minHeap = createMinHeap(V);
+    for (int v = 1; v < V; ++v) {
+        parent[v] = -1;
+        key[v] = INT_MAX;
+        minHeap->array[v] = newMinHeapNode(v, key[v]);
+        minHeap->pos[v] = v;
+    }
+    key[0] = 0;
+    minHeap->array[0] = newMinHeapNode(0, key[0]);
+    minHeap->pos[0] = 0;
+    minHeap->size = V;
+    while (!isEmpty(minHeap)) {
+        MinHeapNode* minHeapNode = extractMin(minHeap);
+        int u = minHeapNode->v;
+        AdjListNode* crawl = graph->array[u].head;
+        while (crawl != NULL) {
+            int v = crawl->dest;
+            if (isInMinHeap(minHeap, v) && crawl->weight < key[v]) {
+                key[v] = crawl->weight;
+                parent[v] = u;
+                decreaseKey(minHeap, v, key[v]);
+            }
+            crawl = crawl->next;
+        }
+    }
+    printMST(parent, V, graph->array);
+}
+
+// Driver program to test above functions
+int main() {
+    int V, E;
+    printf("Enter the number of vertices and edges: ");
+    scanf("%d %d", &V, &E);
+    Graph* graph = createGraph(V);
+    printf("Enter the edges and weights:\n");
+    for (int i = 0; i < E; ++i) {
+        int src, dest, weight;
+        scanf("%d %d %d", &src, &dest, &weight);
+        addEdge(graph, src, dest, weight);
+    }
+    primMST(graph);
+    return 0;
+}
+
