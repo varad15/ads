@@ -1,0 +1,126 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10
+
+// Node structure for chaining
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Hash table entry
+typedef struct HashTableEntry {
+    int key;
+    Node* head;
+} HashTableEntry;
+
+// Hash table structure
+typedef struct HashTable {
+    HashTableEntry* table;
+    int size;
+} HashTable;
+
+// Function to create a new node
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to create a hash table
+HashTable* createHashTable(int size) {
+    HashTable* hashTable = (HashTable*)malloc(sizeof(HashTable));
+    hashTable->table = (HashTableEntry*)malloc(size * sizeof(HashTableEntry));
+    hashTable->size = size;
+    for (int i = 0; i < size; i++) {
+        hashTable->table[i].key = -1;
+        hashTable->table[i].head = NULL;
+    }
+    return hashTable;
+}
+
+// Hash function
+int hashFunction(int key, int size) {
+    return key % size;
+}
+
+// Function to insert a key into the hash table
+void insert(HashTable* hashTable, int key, int* collisions) {
+    int index = hashFunction(key, hashTable->size);
+    Node* newNode = createNode(key);
+
+    if (hashTable->table[index].key == -1) {
+        // No collision, insert the key
+        hashTable->table[index].key = key;
+        hashTable->table[index].head = newNode;
+    } else {
+        // Collision, handle with linear probing and chaining without replacement
+        (*collisions)++;
+        if (hashTable->table[index].key != key) {
+            // Append to the chain at the initial index
+            Node* temp = hashTable->table[index].head;
+            while (temp->next != NULL) {
+                temp = temp->next;
+            }
+            temp->next = newNode;
+        } else {
+            // Linear probing to find an empty slot
+            while (hashTable->table[index].key != -1) {
+                index = (index + 1) % hashTable->size;
+                (*collisions)++;
+            }
+            hashTable->table[index].key = key;
+            hashTable->table[index].head = newNode;
+        }
+    }
+}
+
+// Function to display the hash table
+void display(HashTable* hashTable) {
+    for (int i = 0; i < hashTable->size; i++) {
+        printf("Table[%d]: ", i);
+        if (hashTable->table[i].key != -1) {
+            Node* temp = hashTable->table[i].head;
+            while (temp != NULL) {
+                printf("%d -> ", temp->data);
+                temp = temp->next;
+            }
+        }
+        printf("NULL\n");
+    }
+}
+
+int main() {
+    int collisions = 0;
+    int n, key;
+
+    printf("Enter the number of elements to be inserted: ");
+    scanf("%d", &n);
+
+    HashTable* hashTable = createHashTable(TABLE_SIZE);
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter element %d: ", i + 1);
+        scanf("%d", &key);
+        insert(hashTable, key, &collisions);
+    }
+
+    display(hashTable);
+    printf("Number of collisions: %d\n", collisions);
+
+    // Free allocated memory
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Node* temp = hashTable->table[i].head;
+        while (temp != NULL) {
+            Node* toDelete = temp;
+            temp = temp->next;
+            free(toDelete);
+        }
+    }
+    free(hashTable->table);
+    free(hashTable);
+
+    return 0;
+}
