@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+// Function to perform DFS traversal from a given vertex
+void DFS(int graph[MAX][MAX], int visited[], int startVertex, int V) {
+    // Stack for DFS
+    int stack[MAX];
+    int top = -1;
+
+    // Push the start vertex onto the stack
+    stack[++top] = startVertex;
+
+    while (top != -1) {
+        int currentVertex = stack[top--];
+
+        if (!visited[currentVertex]) {
+            printf("%d ", currentVertex);
+            visited[currentVertex] = 1;
+        }
+
+        // Push all adjacent unvisited vertices onto the stack
+        for (int i = 0; i < V; i++) {
+            if (graph[currentVertex][i] == 1 && !visited[i]) {
+                stack[++top] = i;
+            }
+        }
+    }
+}
+
+int main() {
+    int V, E;
+    int graph[MAX][MAX];
+    int visited[MAX] = {0};
+
+    printf("Enter the number of vertices: ");
+    scanf("%d", &V);
+
+    // Initialize the adjacency matrix to 0
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            graph[i][j] = 0;
+        }
+    }
+
+    printf("Enter the number of edges: ");
+    scanf("%d", &E);
+
+    printf("Enter the edges (src dest):\n");
+    for (int i = 0; i < E; i++) {
+        int src, dest;
+        scanf("%d %d", &src, &dest);
+        graph[src][dest] = 1;
+        graph[dest][src] = 1; // If the graph is undirected
+    }
+
+    int startVertex;
+    printf("Enter the starting vertex for DFS: ");
+    scanf("%d", &startVertex);
+
+    printf("DFS Traversal starting from vertex %d:\n", startVertex);
+    DFS(graph, visited, startVertex, V);
+
+    return 0;
+}
+input 
+Enter the number of vertices: 5
+Enter the number of edges: 6
+Enter the edges (src dest):
+0 1
+0 2
+1 2
+1 3
+2 4
+3 4
+Enter the starting vertex for DFS: 0
