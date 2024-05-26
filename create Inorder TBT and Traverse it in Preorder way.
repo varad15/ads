@@ -1,0 +1,119 @@
+//create Inorder TBT and Traverse it in Preorder way.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a threaded binary tree node
+struct ThreadedNode {
+    int data;
+    struct ThreadedNode *left, *right;
+    int lTag, rTag; // Left and Right Thread flags
+};
+
+// Function to create a new threaded binary tree node
+struct ThreadedNode* createNode(int data) {
+    struct ThreadedNode* newNode = (struct ThreadedNode*)malloc(sizeof(struct ThreadedNode));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    newNode->lTag = newNode->rTag = 1; // Initializing as thread
+    return newNode;
+}
+
+// Helper function to insert a new node in the threaded binary tree
+struct ThreadedNode* insert(struct ThreadedNode* root, int data) {
+    struct ThreadedNode *current = root, *parent = NULL;
+    while (current != NULL) {
+        if (data == current->data) {
+            return root; // Duplicate data is not allowed
+        }
+        parent = current;
+        if (data < current->data) {
+            if (current->lTag == 0) {
+                current = current->left;
+            } else {
+                break;
+            }
+        } else {
+            if (current->rTag == 0) {
+                current = current->right;
+            } else {
+                break;
+            }
+        }
+    }
+
+    struct ThreadedNode* newNode = createNode(data);
+    if (parent == NULL) {
+        root = newNode;
+    } else if (data < parent->data) {
+        newNode->left = parent->left;
+        newNode->right = parent;
+        parent->lTag = 0;
+        parent->left = newNode;
+    } else {
+        newNode->right = parent->right;
+        newNode->left = parent;
+        parent->rTag = 0;
+        parent->right = newNode;
+    }
+    return root;
+}
+
+// Function to traverse the threaded binary tree in Preorder
+void preorderTraversal(struct ThreadedNode* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    struct ThreadedNode* current = root;
+    while (current != NULL) {
+        printf("%d ", current->data);
+
+        // If lTag is false, move to the left child
+        if (current->lTag == 0) {
+            current = current->left;
+        } else {
+            // Otherwise, move to the inorder successor
+            while (current != NULL && current->rTag == 1) {
+                current = current->right;
+            }
+            if (current != NULL) {
+                current = current->right;
+            }
+        }
+    }
+}
+
+int main() {
+    struct ThreadedNode* root = NULL;
+    int choice, data;
+
+    printf("Threaded Binary Tree Operations:\n");
+    printf("1. Insert Node\n");
+    printf("2. Preorder Traversal\n");
+    printf("3. Exit\n");
+
+    while (1) {
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert: ");
+                scanf("%d", &data);
+                root = insert(root, data);
+                break;
+            case 2:
+                printf("Preorder Traversal of Threaded Binary Tree: ");
+                preorderTraversal(root);
+                printf("\n");
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
