@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a doubly linked list node
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+    return newNode;
+}
+
+// Function to add an element to the end of the queue
+void enqueue(struct Node** head, struct Node** tail, int data) {
+    struct Node* newNode = createNode(data);
+    if (*tail == NULL) { // If the queue is empty
+        *head = newNode;
+        *tail = newNode;
+    } else {
+        (*tail)->next = newNode;
+        newNode->prev = *tail;
+        *tail = newNode;
+    }
+    printf("Enqueued %d to the queue.\n", data);
+}
+
+// Function to delete an element from the front of the queue
+int dequeue(struct Node** head, struct Node** tail) {
+    if (*head == NULL) { // If the queue is empty
+        printf("Queue underflow! Cannot dequeue from an empty queue.\n");
+        return -1;
+    }
+    struct Node* temp = *head;
+    int dequeuedData = temp->data;
+    *head = (*head)->next;
+    if (*head != NULL) {
+        (*head)->prev = NULL;
+    } else {
+        *tail = NULL;
+    }
+    free(temp);
+    printf("Dequeued %d from the queue.\n", dequeuedData);
+    return dequeuedData;
+}
+
+// Function to print the queue
+void printQueue(struct Node* head) {
+    struct Node* temp = head;
+    printf("Queue: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Main function to test enqueue and dequeue operations
+int main() {
+    struct Node* head = NULL;
+    struct Node* tail = NULL;
+
+    enqueue(&head, &tail, 10);
+    enqueue(&head, &tail, 20);
+    enqueue(&head, &tail, 30);
+    printQueue(head);
+
+    dequeue(&head, &tail);
+    printQueue(head);
+
+    dequeue(&head, &tail);
+    printQueue(head);
+
+    dequeue(&head, &tail);
+    printQueue(head);
+
+    dequeue(&head, &tail); // This should display an underflow message
+
+    return 0;
+}
+
